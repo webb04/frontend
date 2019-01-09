@@ -17,7 +17,7 @@ import { init as prepareGoogletag } from 'commercial/modules/dfp/prepare-googlet
 import { init as prepareSonobiTag } from 'commercial/modules/dfp/prepare-sonobi-tag';
 import { init as initLiveblogAdverts } from 'commercial/modules/liveblog-adverts';
 import { init as initStickyTopBanner } from 'commercial/modules/sticky-top-banner';
-import { init as initThirdPartyTags } from 'commercial/modules/third-party-tags';
+// import { init as initThirdPartyTags } from 'commercial/modules/third-party-tags';
 import { init as initPaidForBand } from 'commercial/modules/paidfor-band';
 import { paidContainers } from 'commercial/modules/paid-containers';
 import {
@@ -29,7 +29,7 @@ import {
 } from 'commercial/modules/dfp/performance-logging';
 import { trackPerformance } from 'common/modules/analytics/google';
 import { commercialFeatures } from 'common/modules/commercial/commercial-features';
-import { initCheckDispatcher } from 'commercial/modules/check-dispatcher';
+// import { initCheckDispatcher } from 'commercial/modules/check-dispatcher';
 import { initCommentAdverts } from 'commercial/modules/comment-adverts';
 
 const commercialModules: Array<Array<any>> = [
@@ -37,10 +37,10 @@ const commercialModules: Array<Array<any>> = [
     ['cm-closeDisabledSlots', closeDisabledSlots],
     ['cm-prepare-cmp', initCmpService],
     ['cm-track-cmp-consent', trackCmpConsent],
-    //['cm-thirdPartyTags', initThirdPartyTags],
+    // ['cm-thirdPartyTags', initThirdPartyTags],
     ['cm-prepare-sonobi-tag', prepareSonobiTag, true],
     ['cm-prepare-googletag', prepareGoogletag, true],
-    //['cm-checkDispatcher', initCheckDispatcher],
+    // ['cm-checkDispatcher', initCheckDispatcher],
     ['cm-lotame-cmp', initLotameCmp],
     ['cm-lotame-data-extract', initLotameDataExtract, true],
 ];
@@ -131,7 +131,7 @@ const loadModules = (): Promise<void> => {
 };
 
 export const bootCommercial = (): Promise<void> => {
-    console.log("Pascal and George were here!")
+    console.log('Pascal and George were here!');
 
     markTime('commercial start');
     catchErrorsWithContext([
@@ -176,5 +176,4 @@ export const bootCommercial = (): Promise<void> => {
                 feature: 'commercial',
             });
         });
-
 };
