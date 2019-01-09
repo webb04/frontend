@@ -37,10 +37,10 @@ const commercialModules: Array<Array<any>> = [
     ['cm-closeDisabledSlots', closeDisabledSlots],
     ['cm-prepare-cmp', initCmpService],
     ['cm-track-cmp-consent', trackCmpConsent],
-    ['cm-thirdPartyTags', initThirdPartyTags],
+    //['cm-thirdPartyTags', initThirdPartyTags],
     ['cm-prepare-sonobi-tag', prepareSonobiTag, true],
     ['cm-prepare-googletag', prepareGoogletag, true],
-    ['cm-checkDispatcher', initCheckDispatcher],
+    //['cm-checkDispatcher', initCheckDispatcher],
     ['cm-lotame-cmp', initLotameCmp],
     ['cm-lotame-data-extract', initLotameDataExtract, true],
 ];
@@ -131,6 +131,8 @@ const loadModules = (): Promise<void> => {
 };
 
 export const bootCommercial = (): Promise<void> => {
+    console.log("Pascal and George were here!")
+
     markTime('commercial start');
     catchErrorsWithContext([
         [
@@ -174,4 +176,5 @@ export const bootCommercial = (): Promise<void> => {
                 feature: 'commercial',
             });
         });
+
 };
