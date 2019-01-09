@@ -4,8 +4,7 @@
 import 'core-js/modules/es7.object.get-own-property-descriptors';
 
 import domready from 'domready';
-  import config from 'lib/config';
-
+import config from 'lib/config';
 
 // Let webpack know where to get files from
 // __webpack_public_path__ is a special webpack variable
@@ -13,12 +12,9 @@ import domready from 'domready';
 // eslint-disable-next-line camelcase,no-undef
 __webpack_public_path__ = `${config.get('page.assetsPath')}javascripts/`;
 
-
 // kick off the app
 const go = () => {
     domready(() => {
-
-
         // 2. once standard is done, next is commercial
         if (process.env.NODE_ENV !== 'production') {
             window.guardian.adBlockers.onDetect.push(isInUse => {
@@ -36,13 +32,10 @@ const go = () => {
 
         // eslint-disable-next-line no-nested-ternary
 
-              import(/* webpackChunkName: "commercial" */ 'bootstraps/commercial').then(_=>_.bootCommercial())
-
+        import(/* webpackChunkName: "commercial" */ 'bootstraps/commercial').then(
+            _ => _.bootCommercial()
+        );
     });
-}
+};
 
-
-
-
-
-go()
+go();
