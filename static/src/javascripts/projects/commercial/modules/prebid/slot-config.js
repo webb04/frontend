@@ -22,46 +22,30 @@ const filterByAdvertId = (
     return adUnits;
 };
 
-const getMostPopularSizes = memoize((contentType: string) => {
+const getMostPopularSizes = memoize((isArticle: boolean) => {
     // Only works for articles for now.
-    if (
-        contentType === 'Article' &&
-        config.get('switches.extendedMostPopular')
-    ) {
+    if (isArticle && config.get('switches.extendedMostPopular')) {
         return [[300, 600], [300, 250]];
     }
     return [[300, 250]];
 });
 
-const getInlineSizes = memoize((contentType: string) => {
-    switch (contentType) {
-        case 'Gallery':
-            return [[300, 250], [970, 250]];
-        case 'Crossword':
-            return [[728, 90]];
-        case 'Article':
-            return [[300, 600], [300, 250]];
-        default:
-            return [[300, 250]];
+const getInlineSizes = (contentType: string) => {
+    if (contentType === 'Gallery') {
+        return [[970, 250], [300, 250]];
     }
-});
-
-const firstInlineSize = (contentType: string) => {
-    switch (contentType) {
-        case 'Gallery':
-            return [[300, 250], [970, 250]];
-        case 'Crossword':
-            return [[728, 90]];
-        default:
-            return [[300, 250]];
+    if (contentType === 'Article') {
+        return [[300, 600], [300, 250]];
     }
+    return [[300, 250]];
 };
 
 const getSlots = (contentType: string): Array<PrebidSlot> => {
+    const isCrossword = contentType === 'Crossword';
     const commonSlots: Array<PrebidSlot> = [
         {
             key: 'mostpop',
-            sizes: getMostPopularSizes(contentType),
+            sizes: getMostPopularSizes(contentType === 'Article'),
         },
         {
             key: 'right',
@@ -69,7 +53,7 @@ const getSlots = (contentType: string): Array<PrebidSlot> => {
         },
         {
             key: 'inline1',
-            sizes: firstInlineSize(contentType),
+            sizes: isCrossword ? [[728, 90]] : [[300, 250]],
         },
     ];
 
@@ -95,7 +79,7 @@ const getSlots = (contentType: string): Array<PrebidSlot> => {
         },
         {
             key: 'inline',
-            sizes: getInlineSizes(contentType),
+            sizes: [[300, 250]],
         },
     ];
 

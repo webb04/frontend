@@ -87,29 +87,25 @@ describe('getSlots', () => {
         });
     });
 
-    test('should return the correct slots at breakpoint T on gallery pages', () => {
-        getBreakpointKey.mockReturnValue('T');
+    test('should return the correct slots at breakpoint D on gallery pages', () => {
+        getBreakpointKey.mockReturnValue('D');
         const desktopSlots = getSlots('Gallery');
         expect(desktopSlots).toContainEqual({
-            key: 'inline',
-            sizes: [[300, 600], [300, 250]],
-        });
-        expect(desktopSlots).not.toContainEqual({
-            key: 'inline',
+            key: 'inline1',
             sizes: [[300, 250]],
+        });
+        expect(desktopSlots).toContainEqual({
+            key: 'inline',
+            sizes: [[970, 250], [300, 250]],
         });
     });
 
     test('should return the correct slots at breakpoint T on crossword pages', () => {
         getBreakpointKey.mockReturnValue('T');
-        const desktopSlots = getSlots('Crossword');
-        expect(desktopSlots).toContainEqual({
-            key: 'inline',
-            sizes: [[300, 600], [300, 250]],
-        });
-        expect(desktopSlots).not.toContainEqual({
-            key: 'inline',
-            sizes: [[300, 250]],
+        const tabletSlots = getSlots('Crossword');
+        expect(tabletSlots).toContainEqual({
+            key: 'inline1',
+            sizes: [[728, 90]],
         });
     });
 
