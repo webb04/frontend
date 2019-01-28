@@ -22,19 +22,46 @@ const filterByAdvertId = (
     return adUnits;
 };
 
-const getMostPopularSizes = memoize((isArticle: boolean) => {
+const getMostPopularSizes = memoize((contentType: string) => {
     // Only works for articles for now.
-    if (isArticle && config.get('switches.extendedMostPopular')) {
+    if (
+        contentType === 'Article' &&
+        config.get('switches.extendedMostPopular')
+    ) {
         return [[300, 600], [300, 250]];
     }
     return [[300, 250]];
 });
 
-const getSlots = (isArticle: boolean): Array<PrebidSlot> => {
+const getInlineSizes = memoize((contentType: string) => {
+    switch (contentType) {
+        case 'Gallery':
+            return [[300, 250], [970, 250]];
+        case 'Crossword':
+            return [[728, 90]];
+        case 'Article':
+            return [[300, 600], [300, 250]];
+        default:
+            return [[300, 250]];
+    }
+});
+
+const firstInlineSize = (contentType: string) => {
+    switch (contentType) {
+        case 'Gallery':
+            return [[300, 250], [970, 250]];
+        case 'Crossword':
+            return [[728, 90]];
+        default:
+            return [[300, 250]];
+    }
+};
+
+const getSlots = (contentType: string): Array<PrebidSlot> => {
     const commonSlots: Array<PrebidSlot> = [
         {
             key: 'mostpop',
-            sizes: getMostPopularSizes(isArticle),
+            sizes: getMostPopularSizes(contentType),
         },
         {
             key: 'right',
@@ -42,7 +69,7 @@ const getSlots = (isArticle: boolean): Array<PrebidSlot> => {
         },
         {
             key: 'inline1',
-            sizes: [[300, 250]],
+            sizes: firstInlineSize(contentType),
         },
     ];
 
@@ -53,7 +80,7 @@ const getSlots = (isArticle: boolean): Array<PrebidSlot> => {
         },
         {
             key: 'inline',
-            sizes: isArticle ? [[300, 600], [300, 250]] : [[300, 250]],
+            sizes: getInlineSizes(contentType),
         },
         {
             key: 'comments',
@@ -68,7 +95,7 @@ const getSlots = (isArticle: boolean): Array<PrebidSlot> => {
         },
         {
             key: 'inline',
-            sizes: [[300, 250]],
+            sizes: getInlineSizes(contentType),
         },
     ];
 
@@ -93,7 +120,7 @@ const getSlots = (isArticle: boolean): Array<PrebidSlot> => {
     }
 };
 
-export const slots = (advertId: string, isArticle: boolean) =>
-    filterByAdvertId(advertId, getSlots(isArticle));
+export const slots = (advertId: string, contentType: string) =>
+    filterByAdvertId(advertId, getSlots(contentType));
 
 export const _ = { getSlots };
