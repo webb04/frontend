@@ -125,8 +125,6 @@ class PrebidService {
             return PrebidService.requestQueue;
         }
 
-        const isArticle = config.get('page.contentType') === 'Article';
-
         const adUnits: Array<PrebidAdUnit> = slots(
             advert.id,
             config.get('page.contentType', '')
