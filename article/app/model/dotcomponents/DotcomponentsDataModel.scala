@@ -1,22 +1,23 @@
 package model.dotcomponents
 
 import common.Edition
-import conf.Configuration
+import conf.{Configuration, Static}
 import controllers.ArticlePage
 import model.SubMetaLinks
 import model.dotcomrendering.pageElements.PageElement
 import navigation.NavMenu
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
-import views.support.{CamelCase, GUDateTimeFormat, ImgSrc, Item1200}
+import views.support.{CamelCase, GUDateTimeFormat, GoogleAnalyticsAccount, ImgSrc, Item1200}
 import ai.x.play.json.Jsonx
 import common.Maps.RichMap
-import navigation.UrlHelpers.{AmpHeader, AmpFooter}
+import navigation.UrlHelpers.{AmpFooter, AmpHeader}
 import common.commercial.CommercialProperties
 import navigation.UrlHelpers.{Footer, Header, SideMenu, getReaderRevenueUrl}
 import navigation.ReaderRevenueSite.{Support, SupportContribute, SupportSubscribe}
 import model.meta.{Guardian, LinkedData, PotentialAction}
-import ai.x.play.json.implicits.optionWithNull // Note, required despite Intellij saying otherwise
+import ai.x.play.json.implicits.optionWithNull
+import experiments.Experiment // Note, required despite Intellij saying otherwise
 
 // We have introduced our own set of objects for serializing data to the DotComponents API,
 // because we don't want people changing the core frontend models and as a side effect,
@@ -165,10 +166,55 @@ case class ContentFields(
     blocks: Blocks
 )
 
+/** Temporary stuff!! */
+
+case class Tracking(ready: String)
+case class Modules(tracking: Tracking)
+case class Images(
+     commercial: Map[String,String],
+     acquisitions: Map[String,String],
+     journalism: Map[String,String]
+)
+case class Font(kerningOn: String)
+case class Fonts(
+     hintingCleartype: Font,
+     hintingOff: Font,
+     hintingAuto: Font
+)
+case class Stylesheets(fonts: Fonts)
+case class Trackers(
+     editorialTest: String,
+     editorialProd: String,
+     editorial: String
+)
+case class GoogleAnalytics(
+     trackers: Trackers,
+     timingEvents: List[String]
+)
+case class Cmp(fullVendorDataUrl: String)
+case class Libs(
+     googletag: String,
+     cmp: Cmp
+)
+case class GlobalJsConfig(
+     page: PageData,
+     navMenu: NavMenu,
+     switches: Map[String,Boolean],
+     tests: List[String], // Nope!
+     modules: Modules,
+     images: Images,
+     stylesheets: Stylesheets,
+     googleAnalytics: GoogleAnalytics,
+     libs: Libs
+)
+
+/** Temporary stuff ends */
+
 case class DotcomponentsDataModel(
     contentFields: ContentFields,
     config: Config,
     tags: List[Tag],
+    globalJsConfig: GlobalJsConfig,
     version: Int
 )
 
@@ -213,6 +259,44 @@ object PageData {
 object Config {
   implicit val writes = Json.writes[Config]
 }
+
+/** Temporary stuff!! */
+
+object Tracking {
+  implicit val writes = Json.writes[Tracking]
+}
+object Modules {
+  implicit val writes = Json.writes[Modules]
+}
+object Images {
+  implicit val writes = Json.writes[Images]
+}
+object Font {
+  implicit val writes = Json.writes[Font]
+}
+object Fonts {
+  implicit val writes = Json.writes[Fonts]
+}
+object Stylesheets {
+  implicit val writes = Json.writes[Stylesheets]
+}
+object Trackers {
+  implicit val writes = Json.writes[Trackers]
+}
+object GoogleAnalytics {
+  implicit val writes = Json.writes[GoogleAnalytics]
+}
+object Cmp {
+  implicit val writes = Json.writes[Cmp]
+}
+object Libs {
+  implicit val writes = Json.writes[Libs]
+}
+object GlobalJsConfig {
+  implicit val writes = Json.writes[GlobalJsConfig]
+}
+
+/** Temporary stuff ends */
 
 object DotcomponentsDataModel {
 
@@ -374,10 +458,57 @@ object DotcomponentsDataModel {
       readerRevenueLinks
     )
 
+    val tests = List("") // this should be a Set of Experiments
+    val modules = Modules(Tracking("")) // this should be null, but Scala
+    val images = Images(
+      Map(
+        "ab-icon" -> Static("images/commercial/ab-icon.png"),
+        "abp-icon" -> Static("images/commercial/abp-icon.png"),
+        "abp-whitelist-instruction-chrome" -> Static("images/commercial/ad-block-instructions-chrome.png")
+      ),
+      Map(
+        "paypal-and-credit-card" -> Static("images/acquisitions/paypal-and-credit-card.png"),
+        "info-logo" -> Static("images/acquisitions/info-logo.svg"),
+        "ad-free" -> Static("images/acquisitions/ad-free.svg")
+      ),
+      Map(
+        "apple-podcast-logo"-> Static("images/journalism/apple-podcast-icon-48.png")
+      )
+    )
+    val stylesheets = Stylesheets(
+      Fonts(
+        Font(Static("stylesheets/webfonts-hinting-cleartype-kerning-on.css")),
+        Font(Static("stylesheets/webfonts-hinting-off-kerning-on.css")),
+        Font(Static("stylesheets/webfonts-hinting-auto-kerning-on.css"))
+      )
+    )
+    val trackers = Trackers(
+      GoogleAnalyticsAccount.editorialTest.trackerName,
+      GoogleAnalyticsAccount.editorialProd.trackerName,
+      GoogleAnalyticsAccount.editorialProd.trackerName // hardcoded for now
+    )
+    val googleAnalytics = GoogleAnalytics(trackers, List())
+    val libs = Libs(
+      Configuration.javascript.config("googletagJsUrl"),
+      Cmp(Static("data/vendor/cmp_vendorlist.json"))
+    )
+    val globalJsConfig = GlobalJsConfig(
+      pageData,
+      navMenu,
+      switches,
+      tests,
+      modules,
+      images,
+      stylesheets,
+      googleAnalytics,
+      libs
+    )
+
     DotcomponentsDataModel(
       contentFields,
       config,
       tags,
+      globalJsConfig,
       VERSION
     )
 
@@ -396,6 +527,7 @@ object DotcomponentsDataModel {
         "tags" -> Json.obj(
           "tags" -> model.tags
         ),
+        "jsConfig" ->  model.globalJsConfig,
         "version" -> model.version
       )
     }
