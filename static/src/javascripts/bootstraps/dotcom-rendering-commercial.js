@@ -130,7 +130,7 @@ const loadModules = (): Promise<void> => {
     );
 };
 
-export const bootCommercial = (): Promise<void> => {
+const go = (): Promise<void> => {
     console.log('commercial features on dotcom rendering is GO!');
 
     markTime('commercial start');
@@ -177,3 +177,10 @@ export const bootCommercial = (): Promise<void> => {
             });
         });
 };
+
+// make sure we've patched the env before running the app
+if (window.guardian.polyfilled) {
+    go();
+} else {
+    window.guardian.onPolyfilled = go;
+}

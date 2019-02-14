@@ -1,7 +1,7 @@
 package model.dotcomponents
 
 import common.Edition
-import conf.Configuration
+import conf.{Configuration, Static}
 import controllers.ArticlePage
 import model.SubMetaLinks
 import model.dotcomrendering.pageElements.PageElement
@@ -153,7 +153,8 @@ case class Config(
     isImmersive: Boolean,
     page: PageData,
     nav: NavMenu,
-    readerRevenueLinks: ReaderRevenueLinks
+    readerRevenueLinks: ReaderRevenueLinks,
+    commercialUrl: String
 )
 
 case class ContentFields(
@@ -367,7 +368,8 @@ object DotcomponentsDataModel {
       article.isImmersive,
       pageData,
       navMenu,
-      readerRevenueLinks
+      readerRevenueLinks,
+      Static("javascripts/graun.dotcom-rendering-commercial.js")
     )
 
     DotcomponentsDataModel(
