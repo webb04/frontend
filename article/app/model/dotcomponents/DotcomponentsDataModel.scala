@@ -1,9 +1,9 @@
 package model.dotcomponents
 
 import common.Edition
-import conf.{Configuration, Static}
+import conf.{Configuration, DiscussionAsset, Static}
 import controllers.ArticlePage
-import model.SubMetaLinks
+import model.{AtomProperties, SubMetaLinks}
 import model.dotcomrendering.pageElements.PageElement
 import navigation.NavMenu
 import play.api.libs.json._
@@ -12,11 +12,13 @@ import views.support.{CamelCase, GUDateTimeFormat, GoogleAnalyticsAccount, ImgSr
 import ai.x.play.json.Jsonx
 import common.Maps.RichMap
 import navigation.UrlHelpers.{AmpFooter, AmpHeader}
-import common.commercial.CommercialProperties
+import common.commercial.{AdUnitMaker, CommercialProperties}
 import navigation.UrlHelpers.{Footer, Header, SideMenu, getReaderRevenueUrl}
 import navigation.ReaderRevenueSite.{Support, SupportContribute, SupportSubscribe}
 import model.meta.{Guardian, LinkedData, PotentialAction}
 import ai.x.play.json.implicits.optionWithNull
+import com.gu.commercial.display.AdTargetParam.toMap
+import com.gu.targeting.client.Campaign
 import experiments.Experiment // Note, required despite Intellij saying otherwise
 
 // We have introduced our own set of objects for serializing data to the DotComponents API,
@@ -150,6 +152,104 @@ case class PageData(
     commercialProperties: Option[CommercialProperties],
     hasAffiliateLinks: Boolean,
     starRating: Option[Int],
+
+    // Commercial workshop
+    avatarApiUrl: String,
+    isColumn: Boolean,
+    membershipUrl: String,
+    isImmersive: Boolean,
+    isProd: Boolean,
+    discussionFrontendUrl: String,
+    membershipAccess: String,
+    allowUserGeneratedContent: Boolean,
+    forecastsapiurl: String,
+    idOAuthUrl: String,
+    supportUrl: String,
+    isPhotoEssay: Boolean,
+    isFront: Boolean,
+    inBodyInternalLinkCount: Int,
+    idWebAppUrl: String,
+    googleSearchUrl: String,
+    inBodyExternalLinkCount: Int,
+    showRelatedContent: Boolean,
+    lightboxImages: JsObject,
+    googleSearchId: String,
+    tones: String,
+    shouldHideReaderRevenue: Boolean,
+    idUrl: String,
+    hasInlineMerchandise: Boolean,
+    omnitureAmpAccount: String,
+    dfpAdUnitRoot: String,
+    trackingNames: String,
+    host: String,
+    hasShowcaseMainElement: Boolean,
+    blogIds: String,
+    sectionName: String,
+    hasMultipleVideosInPage: Boolean,
+    fbAppId: String,
+    isContent: Boolean,
+    shortUrlId: String,
+    dfpAccountId: String,
+    plistaPublicApiKey: String,
+    wordCount: Int,
+    cardStyle: String,
+    adUnit: String,
+    discussionApiUrl: String,
+    isSensitive: Boolean,
+    ophanEmbedJsUrl: String,
+    userAttributesApiUrl: String,
+    videoDuration: Option[Int],
+    blogs: String,
+    discussionApiClientHeader: String,
+    dfpHost: String,
+    weatherapiurl: String,
+    shortUrl: String,
+    thumbnail: String,
+    references: Seq[JsObject],
+    commentable: Boolean,
+    discussionD2Uid: String,
+    ophanJsUrl: String,
+    contributorBio: String,
+    isDev: Boolean,
+    facebookIaAdUnitRoot: String,
+    stripePublicToken: String,
+    omnitureAccount: String,
+    locationapiurl: String,
+    isPaidContent: Boolean,
+    hasYouTubeAtom: Boolean,
+    externalEmbedHost: String,
+    thirdPartyAppsAccount: String,
+    keywords: String,
+    nonKeywordTagIds: String,
+    mobileAppsAdUnitRoot: String,
+    hasPageSkin: Boolean,
+    requiresMembershipAccess: Boolean,
+    revisionNumber: String,
+    optimizeEpicUrl: String,
+    hbImpl: String,
+    assetsPath: String,
+    mmaUrl: String,
+    dfpNonRefreshableLineItemIds: Seq[Long],
+    isLive: Boolean,
+    richLink: String,
+    campaigns: List[JsValue],
+    isLiveBlog: Boolean,
+    pageCode: String,
+    avatarImagesUrl: String,
+    publication: String,
+    buildNumber: String,
+    atomTypes: String, // more complicated than that
+    // sharedAdTargeting: JsValue, // currently broken
+    onwardWebSocket: String,
+    productionOffice: String,
+    pbIndexSites: JsValue,
+    googletagJsUrl: String,
+    idApiUrl: String,
+    atoms: List[String],
+    isPreview: Boolean,
+    appNexusPageTargeting: String,
+    pageAdTargeting: String, //more complicated than that
+    shouldHideAdverts: Boolean
 )
 
 case class Config(
@@ -359,6 +459,11 @@ object DotcomponentsDataModel {
       )
     }
 
+    val showRelatedContent = if (article.content.tags.isTheMinuteArticle) { false } else article.content.showInRelated && !article.content.legallySensitive
+    val hbImpl = if (conf.switches.Switches.prebidSwitch.isSwitchedOn) "prebid" else "none"
+    val dfpNonRefreshableLineItemIds = article.metadata.commercial.map(_.nonRefreshableLineItemIds) getOrElse Nil
+    val sharedAdTargeting = toMap(article.metadata.commercial.map(_.adTargeting(Edition(request))) getOrElse Set.empty)
+
     val pageData = PageData(
       article.tags.contributors.map(_.name).mkString(","),
       article.metadata.id,
@@ -397,7 +502,103 @@ object DotcomponentsDataModel {
       isCommentable = article.trail.isCommentable,
       article.metadata.commercial,
       article.content.fields.showAffiliateLinks.getOrElse(false),
-      article.content.starRating
+      article.content.starRating,
+      "https://avatar.code.dev-theguardian.com", // DEVINFRA
+      article.content.isColumn,
+      Configuration.id.membershipUrl,
+      article.content.isImmersive,
+      Configuration.environment.isProd,
+      DiscussionAsset("discussion-frontend.preact.iife"),
+      article.metadata.membershipAccess.getOrElse(""),
+      article.content.allowUserGeneratedContent,
+      "", //forecastsapiurl
+      Configuration.id.oauthUrl,
+      Configuration.id.supportUrl,
+      article.content.isPhotoEssay,
+      article.metadata.isFront,
+      article.content.linkCounts.internal,
+      Configuration.id.oauthUrl,
+      "//www.google.co.uk/cse/cse.js",
+      article.content.linkCounts.external,
+      showRelatedContent,
+      article.lightbox.javascriptConfig,
+      "007466294097402385199:m2ealvuxh1i",
+      article.tags.tones.map(_.id).mkString(","),
+      article.content.fields.shouldHideReaderRevenue.getOrElse(false),
+      Configuration.id.url,
+      article.commercial.hasInlineMerchandise,
+      "guardiangudev-code", // DEVINFRA
+      "theguardian.com", // DEVINFRA
+      "", // trackingNames
+      Configuration.site.host,
+      article.content.elements.hasShowcaseMainElement,
+      article.tags.blogs.map(_.id).mkString(","),
+      article.trail.sectionName,
+      article.content.hasMultipleVideosInPage,
+      "202314643182694", // DEVINFRA
+      true,
+      article.content.fields.shortUrlId,
+      "59666047", // DEVINFRA
+      "", // plistaPublicApiKey
+      article.content.wordCount,
+      article.content.cardStyle.toneString,
+      AdUnitMaker.make(article.metadata.id, article.metadata.adUnitSuffix),
+      "https://discussion.code.dev-theguardian.com/discussion-api", // DEVINFRA
+      article.fields.sensitive.getOrElse(false),
+      Configuration.ophan.embedJsLocation,
+      "", // userAttributesApiUrl
+      article.content.elements.videos.headOption.map { v => v.videos.duration },
+      article.tags.blogs.map { _.name }.mkString(","),
+      Configuration.discussion.apiClientHeader,
+      "pubads.g.doubleclick.net",
+      "", // weatherapiurl
+      article.content.fields.shortUrl,
+      article.trail.thumbnailPath.getOrElse(""),
+      article.content.javascriptReferences,
+      article.trail.isCommentable,
+      Configuration.discussion.d2Uid,
+      Configuration.ophan.jsLocation,
+      article.content.contributorBio.getOrElse(""),
+      !Configuration.environment.isProd,
+      "facebook-instant-articles", // DEVINFRA
+      Configuration.id.stripePublicToken,
+      "guardiangudev-code", // DEVINFRA
+      "", // locationapiurl
+      article.content.isPaidContent,
+      AtomProperties.hasYouTubeAtom(article.content.atoms),
+      "https://embed.theguardian.com",
+      Configuration.omniture.thirdPartyAppsAccount,
+      article.tags.keywords.map { _.name }.mkString(","),
+      article.tags.nonKeywordTags.map { _.id }.mkString(","),
+      "beta-guardian-app", // DEVINFRA
+      article.metadata.hasPageSkin(Edition(request)),
+      article.content.metadata.requiresMembershipAccess,
+      article.metadata.revision,
+      Configuration.id.optimizeEpicUrl,
+      hbImpl,
+      Configuration.assets.path,
+      Configuration.id.mmaUrl,
+      dfpNonRefreshableLineItemIds,
+      article.trail.fields.isLive,
+      article.tags.richLink.getOrElse(""),
+      article.content.campaigns.map(Campaign.toJson),
+      article.content.tags.isLiveBlog,
+      article.content.internalPageCode,
+      "", // avatarImagesUrl
+      article.content.publication,
+      article.metadata.buildNumber,
+      "", // atomTypes
+      // Json.toJson(sharedAdTargeting), // TODO: what's going wrong here??
+      "", // onwardWebSocket
+      article.content.productionOffice.getOrElse(""),
+      Json.toJson(article.metadata.commercial.flatMap(_.prebidIndexSites).getOrElse(Set.empty)),
+      Configuration.googletag.jsLocation,
+      Configuration.id.apiRoot,
+      List(""), // atoms
+      false, // isPreview
+      "", // appNexusPageTargeting
+      "", // pageAdTargeting
+      article.content.shouldHideAdverts
     )
 
     val tags = article.tags.tags.map(
