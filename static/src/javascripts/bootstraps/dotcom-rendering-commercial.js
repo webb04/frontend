@@ -3,7 +3,7 @@
 import { catchErrorsWithContext } from 'lib/robust';
 import { markTime } from 'lib/user-timing';
 import reportError from 'lib/report-error';
-// import { init as initHighMerch } from 'commercial/modules/high-merch';
+import { init as initHighMerch } from 'commercial/modules/high-merch';
 // import { init as initArticleAsideAdverts } from 'commercial/modules/article-aside-adverts';
 // import { init as initArticleBodyAdverts } from 'commercial/modules/article-body-adverts';
 import { closeDisabledSlots } from 'commercial/modules/close-disabled-slots';
@@ -28,7 +28,7 @@ import {
     primaryBaseline,
 } from 'commercial/modules/dfp/performance-logging';
 import { trackPerformance } from 'common/modules/analytics/google';
-// import { commercialFeatures } from 'common/modules/commercial/commercial-features';
+import { commercialFeatures } from 'common/modules/commercial/commercial-features';
 // // import { initCheckDispatcher } from 'commercial/modules/check-dispatcher';
 // import { initCommentAdverts } from 'commercial/modules/comment-adverts';
 
@@ -38,26 +38,26 @@ const commercialModules: Array<Array<any>> = [
     ['cm-prepare-cmp', initCmpService],
     ['cm-track-cmp-consent', trackCmpConsent],
     ['cm-thirdPartyTags', initThirdPartyTags],
-    ['cm-prepare-prebid', preparePrebid, true],
     ['cm-prepare-googletag', prepareGoogletag, true],
     // ['cm-checkDispatcher', initCheckDispatcher],
-    ['cm-lotame-cmp', initLotameCmp],
-    ['cm-lotame-data-extract', initLotameDataExtract, true],
 ];
 
-// if (!commercialFeatures.adFree) {
-//     commercialModules.push(
-//         ['cm-prepare-adverification', prepareAdVerification, true],
-//         ['cm-highMerch', initHighMerch],
-//         ['cm-articleAsideAdverts', initArticleAsideAdverts, true],
-//         ['cm-articleBodyAdverts', initArticleBodyAdverts, true],
-//         ['cm-liveblogAdverts', initLiveblogAdverts, true],
-//         ['cm-stickyTopBanner', initStickyTopBanner],
-//         ['cm-paidContainers', paidContainers],
-//         ['cm-paidforBand', initPaidForBand],
-//         ['cm-commentAdverts', initCommentAdverts]
-//     );
-// }
+if (!commercialFeatures.adFree) {
+    commercialModules.push(
+        ['cm-prepare-prebid', preparePrebid, true],
+        ['cm-lotame-cmp', initLotameCmp],
+        ['cm-lotame-data-extract', initLotameDataExtract, true],
+        // ['cm-prepare-adverification', prepareAdVerification, true],
+        ['cm-highMerch', initHighMerch]
+        // ['cm-articleAsideAdverts', initArticleAsideAdverts, true]
+        // ['cm-articleBodyAdverts', initArticleBodyAdverts, true],
+        // ['cm-liveblogAdverts', initLiveblogAdverts, true],
+        // ['cm-stickyTopBanner', initStickyTopBanner],
+        // ['cm-paidContainers', paidContainers],
+        // ['cm-paidforBand', initPaidForBand],
+        // ['cm-commentAdverts', initCommentAdverts]
+    );
+}
 
 const loadModules = (): Promise<void> => {
     addStartTimeBaseline(primaryBaseline);
@@ -93,8 +93,6 @@ const loadModules = (): Promise<void> => {
 };
 
 const go = (): Promise<void> => {
-    console.log('commercial features on dotcom rendering is GO!');
-
     markTime('commercial start');
 
     catchErrorsWithContext([
