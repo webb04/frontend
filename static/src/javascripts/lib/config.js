@@ -8,6 +8,14 @@ const config: { [string]: any } = window.guardian.config;
 // allows you to safely get items from config using a query of
 // dot or bracket notation, with optional default fallback
 const get = (path: string = '', defaultValue: any): any => {
+    if (!window.guModel) {
+        window.guModel = [];
+    }
+
+    if (!window.guModel.includes(path)) {
+        window.guModel.push(path);
+    }
+
     const value = path
         .replace(/\[(.+?)\]/g, '.$1')
         .split('.')
