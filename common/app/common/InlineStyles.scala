@@ -74,7 +74,7 @@ object InlineStyles {
     val (inline, head) = styles(document)
 
     document.getElementsByTag("head").asScala.headOption map { el =>
-      el.getElementsByTag("style").asScala.foreach(_.remove)
+      el.getElementsByTag("style").asScala.filter(el => el.id != "embedded-css").foreach(_.remove)
       head.map(css => el.appendChild(document.createElement("style").text(css)))
     }
 
@@ -97,7 +97,7 @@ object InlineStyles {
     * The first item is the styles that should stay in the head, the second is everything that should be inlined.
     */
   def styles(document: Document): (Seq[CSSRule], Seq[String]) = {
-    document.getElementsByTag("style").asScala.foldLeft((Seq.empty[CSSRule], Seq.empty[String])) { case ((inline, head), element) =>
+    document.getElementsByTag("style").asScala.filter(el => el.id != "embedded-css").foldLeft((Seq.empty[CSSRule], Seq.empty[String])) { case ((inline, head), element) =>
       val source = new InputSource(new StringReader(element.html))
       val cssParser = new CSSOMParser(new SACParserCSS3())
       Retry(3)(cssParser.parseStyleSheet(source, null, null)) { (exception, attemptNumber) =>
