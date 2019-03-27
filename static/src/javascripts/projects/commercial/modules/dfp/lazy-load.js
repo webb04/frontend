@@ -36,17 +36,20 @@ const onIntersect = (
     );
 };
 
-const getObserver = once(() =>
-    Promise.resolve(
-        new window.IntersectionObserver(onIntersect, {
+const getObserver: () => IntersectionObserver | null = once(() => {
+    if (dfpEnv.lazyLoadObserve) {
+        return new window.IntersectionObserver(onIntersect, {
             rootMargin: '200px 0px',
-        })
-    )
-);
+        });
+    }
+    return null;
+});
 
 export const enableLazyLoad = (advert: Advert): void => {
-    if (dfpEnv.lazyLoadObserve) {
-        getObserver().then(observer => observer.observe(advert.node));
+    const observer = getObserver();
+
+    if (observer) {
+        observer.observe(advert.node);
     } else {
         displayAd(advert.id);
     }
