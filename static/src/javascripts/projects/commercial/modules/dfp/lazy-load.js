@@ -54,3 +54,5 @@ export const enableLazyLoad = (advert: Advert): void => {
         displayAd(advert.id);
     }
 };
+
+export const _ = { getObserver };
