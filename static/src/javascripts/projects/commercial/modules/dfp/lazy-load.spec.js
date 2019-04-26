@@ -45,12 +45,12 @@ describe('getObserver', () => {
         window.IntersectionObserver = windowIntersectionObserver;
     });
 
-    it('', () => {
+    it('should return an observer if lazyLoadObserve is true', () => {
         dfpEnv.lazyLoadObserve = true;
         expect(getObserver()).toEqual({ observe: expect.any(Function) });
     });
 
-    it('', () => {
+    it('should return null lazyLoadObserve is false', () => {
         dfpEnv.lazyLoadObserve = false;
         expect(getObserver()).toBe(null);
     });
@@ -80,7 +80,7 @@ describe('enableLazyLoad', () => {
         expect(windowIntersectionObserver).toBe(undefined);
     });
 
-    it('should create an observer if lazyLoadObserve is true', () => {
+    it('should call the observer if lazyLoadObserve is true', () => {
         dfpEnv.lazyLoadObserve = true;
         getAdvertById.mockReturnValue(testAdvert);
         enableLazyLoad(testAdvert);
@@ -96,7 +96,6 @@ describe('enableLazyLoad', () => {
         getAdvertById.mockReturnValue(testAdvert);
         enableLazyLoad(testAdvert);
 
-        expect(getAdvertById.mock.calls).toEqual([['test-advert']]);
         expect(loadAdvert).toHaveBeenCalledWith(testAdvert);
     });
 });
