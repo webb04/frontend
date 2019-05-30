@@ -7,6 +7,7 @@ import model.pressed._
 object FixtureBuilder {
 
   def mkContent(id: Int): PressedContent = FixtureBuilder.mkPressedContent(id)
+  def mkLinkSnapContent(id: Int): PressedContent = FixtureBuilder.mkPressedContent(id, None, true)
 
   def mkPressedCollection(id: String, curated: Seq[PressedContent] = IndexedSeq.empty, backfill: Seq[PressedContent] = IndexedSeq.empty, maxItemsToDisplay: Option[Int] = None): PressedCollection = {
     PressedCollection(
@@ -40,7 +41,7 @@ object FixtureBuilder {
     )
   }
 
-  def mkPressedContent(id: Int, kicker: Option[ItemKicker] = None): PressedContent = {
+  def mkPressedContent(id: Int, kicker: Option[ItemKicker] = None, snap: Boolean = false): PressedContent = {
 
     def mkProperties(): PressedProperties = PressedProperties(
       isBreaking = false,
@@ -72,7 +73,7 @@ object FixtureBuilder {
       isAudio = false,
       kicker,
       seriesOrBlogKicker = None,
-      headline = "",
+      headline = s"header headline $id",
       url = id.toString,
       hasMainVideoElement = None
     )
@@ -104,15 +105,26 @@ object FixtureBuilder {
       showLivePlayable = false
     )
 
-    CuratedContent(
-      properties = mkProperties(),
-      header = mkHeader(),
-      card = mkCard(),
-      discussion = mkDiscussion(),
-      display = mkDisplay(),
-      enriched = None,
-      supportingContent = Nil,
-      cardStyle = DefaultCardstyle
-    )
+    if (snap == true) {
+      LinkSnap(
+        properties = mkProperties(),
+        header = mkHeader(),
+        card = mkCard(),
+        discussion = mkDiscussion(),
+        display = mkDisplay(),
+        enriched = None,
+      )
+    } else {
+      CuratedContent(
+        properties = mkProperties(),
+        header = mkHeader(),
+        card = mkCard(),
+        discussion = mkDiscussion(),
+        display = mkDisplay(),
+        enriched = None,
+        supportingContent = Nil,
+        cardStyle = DefaultCardstyle
+      )
+    }
   }
 }
