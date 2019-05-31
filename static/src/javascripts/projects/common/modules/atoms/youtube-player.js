@@ -31,6 +31,18 @@ const addVideoStartedClass = (el: ?HTMLElement) => {
 type Handlers = {
     onPlayerReady: (event: Object) => void,
     onPlayerStateChange: (event: Object) => void,
+    onAdStart: (event: Object) => void,
+};
+
+const onAdStartEvent = (event, handlers: Handlers, el: ?HTMLElement) => {
+    if (el && config.get('page.isDev')) {
+        const isPreroll = !hasPlayerStarted(event);
+        console.log(`💰 ${isPreroll ? 'pre-roll' : 'advert'} started`);
+    }
+console.log(handlers);
+    if (handlers && typeof handlers.onAdStart === 'function') {
+        handlers.onAdStart(event);
+    }
 };
 
 const onPlayerStateChangeEvent = (
@@ -157,10 +169,7 @@ export const initYoutubePlayer = (
             console.error(`YOUTUBE: ${event}`);
         };
 
-        const onAdStart = event => {
-            const isPreroll = !hasPlayerStarted(event);
-            console.log(`${isPreroll ? 'pre-roll' : 'advert'} started`);
-        };
+        const onAdStart = event => onAdStartEvent(event, handlers, getPlayerIframe(videoId));
 
         const onAdEnd = event => {
             const isPreroll = !hasPlayerStarted(event);

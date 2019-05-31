@@ -156,6 +156,9 @@ export const initHostedYoutube = (el: HTMLElement): void => {
                     }
                 });
             },
+            onAdStart(event: { target: YouTubePlayer }) {
+                console.log('asdasd');
+            },
         },
         el.dataset.assetId
     );
