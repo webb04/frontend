@@ -16,10 +16,10 @@ export class ConsentManagementPlatform {
         newPerfStack: Array<Function>,
         newAdStack: Array<Function>
     ): void {
-        this.essenStack.concat(newEssenStack);
-        this.funcStack.concat(newFuncStack);
-        this.perfStack.concat(newPerfStack);
-        this.adStack.concat(newAdStack);
+        this.essenStack.push(...newEssenStack);
+        this.funcStack.push(...newFuncStack);
+        this.perfStack.push(...newPerfStack);
+        this.adStack.push(...newAdStack);
     }
 
     runModules() {
@@ -27,6 +27,10 @@ export class ConsentManagementPlatform {
         const funcConsent = ConsentManagementPlatform.functionalConsent();
         const perfConsent = ConsentManagementPlatform.performanceConsent();
         const adConsent = ConsentManagementPlatform.advertisementConsent();
+
+        this.essenStack.forEach(module => {
+            modulePromises.push(module());
+        });
 
         if (funcConsent) {
             this.funcStack.forEach(module => {
@@ -46,6 +50,14 @@ export class ConsentManagementPlatform {
             });
         }
 
+        // eslint-disable-next-line no-console
+        console.log(
+            `Ran ${modulePromises.length} modules out of ${this.essenStack
+                .length +
+                this.funcStack.length +
+                this.perfStack.length +
+                this.adStack.length} modules.`
+        );
         return modulePromises; // Return instead a single promise wrapping all the module promises?
     }
 

@@ -29,20 +29,27 @@ import { ConsentManagementPlatform } from 'commercial/modules/cmplib/cmp';
 
 const cmp = new ConsentManagementPlatform();
 
-const commercialModules: Array<Array<any>> = [
+const essentialModules: Array<Array<any>> = [
     ['cm-adFreeSlotRemove', adFreeSlotRemove],
     ['cm-closeDisabledSlots', closeDisabledSlots],
     ['cm-prepare-cmp', initCmpService],
     ['cm-track-cmp-consent', trackCmpConsent],
     ['cm-checkDispatcher', initCheckDispatcher],
+];
+
+const functionalModules: Array<Array<any>> = [];
+
+const performanceModules: Array<Array<any>> = [];
+
+const advertisementModules: Array<Array<any>> = [
     ['cm-lotame-cmp', initLotameCmp],
     ['cm-lotame-data-extract', initLotameDataExtract],
 ];
 
 if (!commercialFeatures.adFree) {
-    commercialModules.push(
-        ['cm-prepare-prebid', preparePrebid],
-        ['cm-prepare-googletag', prepareGoogletag],
+    essentialModules.push(
+        ['cm-prepare-prebid', preparePrebid, true],
+        ['cm-prepare-googletag', prepareGoogletag, true],
         ['cm-thirdPartyTags', initThirdPartyTags],
         ['cm-prepare-adverification', prepareAdVerification],
         ['cm-mobileSticky', initMobileSticky],
@@ -68,7 +75,7 @@ const loadHostedBundle = (): Promise<void> => {
                     const hostedGallery = require('commercial/modules/hosted/gallery');
                     const initHostedCarousel = require('commercial/modules/hosted/onward-journey-carousel');
                     const loadOnwardComponent = require('commercial/modules/hosted/onward');
-                    commercialModules.push(
+                    essentialModules.push(
                         ['cm-hostedAbout', hostedAbout.init],
                         ['cm-hostedVideo', initHostedVideo.initHostedVideo],
                         ['cm-hostedGallery', hostedGallery.init],
@@ -94,12 +101,12 @@ const loadSingleModule = (module: Array<any>): Function => {
     const moduleName: string = module[0];
     const moduleInit: () => void = module[1];
 
-    return [
-        (): Promise<void> => {
-            // Setting a promise here just so Flow doesn't complain.
-            // This is messy. Should we just change catchErrorsWithContext return a Promise?
-            let result = Promise.resolve();
-            catchErrorsWithContext(
+    return (): Promise<void> => {
+        // Setting a promise here just so Flow doesn't complain.
+        // This is messy. Should we just change catchErrorsWithContext return a Promise?
+        let result = Promise.resolve();
+        catchErrorsWithContext(
+            [
                 [
                     [
                         moduleName,
@@ -108,23 +115,42 @@ const loadSingleModule = (module: Array<any>): Function => {
                         },
                     ],
                 ],
-                {
-                    feature: 'commercial',
-                }
-            );
-            return result;
-        },
-    ];
+            ],
+            {
+                feature: 'commercial',
+            }
+        );
+        return result;
+    };
 };
 
 const loadModules = (): Promise<void> => {
-    const commercialAdModules = commercialModules.map(module =>
+    const essentialWrappedModules = essentialModules.map(module =>
         loadSingleModule(module)
     );
 
+    const functionalWrappedModules = functionalModules.map(module =>
+        loadSingleModule(module)
+    );
+
+    const performanceWrappedModules = performanceModules.map(module =>
+        loadSingleModule(module)
+    );
+
+    const advertisementWrappedModules = advertisementModules.map(module =>
+        loadSingleModule(module)
+    );
+
+    cmp.addModules(
+        essentialWrappedModules,
+        functionalWrappedModules,
+        performanceWrappedModules,
+        advertisementWrappedModules
+    );
+
     // eslint-disable-next-line no-console
-    console.log('Promises: ', commercialAdModules.length);
-    cmp.addModules([], [], [], commercialAdModules);
+    console.log('Promises: ', essentialModules.length);
+    cmp.addModules([], [], [], advertisementWrappedModules);
     return Promise.all(cmp.runModules()).then((): void => {});
 };
 
