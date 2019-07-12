@@ -5,11 +5,18 @@ import {
 } from 'common/modules/commercial/ad-prefs.lib';
 
 export class ConsentManagementPlatform {
+    essenStack = [];
     funcStack = [];
     perfStack = [];
     adStack = [];
 
-    addModules(newFuncStack, newPerfStack, newAdStack) {
+    addModules(
+        newEssenStack: Array<Function>,
+        newFuncStack: Array<Function>,
+        newPerfStack: Array<Function>,
+        newAdStack: Array<Function>
+    ): void {
+        this.essenStack.concat(newEssenStack);
         this.funcStack.concat(newFuncStack);
         this.perfStack.concat(newPerfStack);
         this.adStack.concat(newAdStack);
@@ -17,11 +24,9 @@ export class ConsentManagementPlatform {
 
     runModules() {
         const modulePromises = [];
-        // The following is for testing purposes. Will eventually get individual consent states
-        const consent = getAdConsentState(thirdPartyTrackingAdConsent);
-        const funcConsent = consent;
-        const perfConsent = consent;
-        const adConsent = consent;
+        const funcConsent = ConsentManagementPlatform.functionalConsent();
+        const perfConsent = ConsentManagementPlatform.performanceConsent();
+        const adConsent = ConsentManagementPlatform.advertisementConsent();
 
         if (funcConsent) {
             this.funcStack.forEach(module => {
@@ -41,6 +46,19 @@ export class ConsentManagementPlatform {
             });
         }
 
-        return modulePromises;
+        return modulePromises; // Return instead a single promise wrapping all the module promises?
+    }
+
+    // The following is for testing purposes. Will eventually get individual consent states
+    static functionalConsent() {
+        return getAdConsentState(thirdPartyTrackingAdConsent);
+    }
+
+    static performanceConsent() {
+        return getAdConsentState(thirdPartyTrackingAdConsent);
+    }
+
+    static advertisementConsent() {
+        return getAdConsentState(thirdPartyTrackingAdConsent);
     }
 }

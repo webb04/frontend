@@ -25,6 +25,9 @@ import { trackPerformance } from 'common/modules/analytics/google';
 import { commercialFeatures } from 'common/modules/commercial/commercial-features';
 import { initCheckDispatcher } from 'commercial/modules/check-dispatcher';
 import { initCommentAdverts } from 'commercial/modules/comment-adverts';
+import { ConsentManagementPlatform } from 'commercial/modules/cmplib/cmp';
+
+const cmp = new ConsentManagementPlatform();
 
 const commercialModules: Array<Array<any>> = [
     ['cm-adFreeSlotRemove', adFreeSlotRemove],
@@ -87,30 +90,42 @@ const loadHostedBundle = (): Promise<void> => {
     return Promise.resolve();
 };
 
-const loadModules = (): Promise<any> => {
-    const modulePromises = [];
+const loadSingleModule = (module: Array<any>): Function => {
+    const moduleName: string = module[0];
+    const moduleInit: () => void = module[1];
 
-    commercialModules.forEach(module => {
-        const moduleName: string = module[0];
-        const moduleInit: () => void = module[1];
-
-        catchErrorsWithContext(
-            [
+    return [
+        (): Promise<void> => {
+            // Setting a promise here just so Flow doesn't complain.
+            // This is messy. Should we just change catchErrorsWithContext return a Promise?
+            let result = Promise.resolve();
+            catchErrorsWithContext(
                 [
-                    moduleName,
-                    function pushAfterComplete(): void {
-                        const result = moduleInit();
-                        modulePromises.push(result);
-                    },
+                    [
+                        moduleName,
+                        function pushAfterComplete(): void {
+                            result = moduleInit();
+                        },
+                    ],
                 ],
-            ],
-            {
-                feature: 'commercial',
-            }
-        );
-    });
+                {
+                    feature: 'commercial',
+                }
+            );
+            return result;
+        },
+    ];
+};
 
-    return Promise.all(modulePromises);
+const loadModules = (): Promise<void> => {
+    const commercialAdModules = commercialModules.map(module =>
+        loadSingleModule(module)
+    );
+
+    // eslint-disable-next-line no-console
+    console.log('Promises: ', commercialAdModules.length);
+    cmp.addModules([], [], [], commercialAdModules);
+    return Promise.all(cmp.runModules()).then((): void => {});
 };
 
 export const bootCommercial = (): Promise<void> => {
