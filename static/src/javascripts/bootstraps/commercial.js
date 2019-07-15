@@ -125,20 +125,11 @@ const loadSingleModule = (module: Array<any>): Function => {
 };
 
 const loadModules = (): Promise<void> => {
-    const essentialWrappedModules = essentialModules.map(module =>
-        loadSingleModule(module)
-    );
-
-    const functionalWrappedModules = functionalModules.map(module =>
-        loadSingleModule(module)
-    );
-
-    const performanceWrappedModules = performanceModules.map(module =>
-        loadSingleModule(module)
-    );
-
-    const advertisementWrappedModules = advertisementModules.map(module =>
-        loadSingleModule(module)
+    const essentialWrappedModules = essentialModules.map(loadSingleModule);
+    const functionalWrappedModules = functionalModules.map(loadSingleModule);
+    const performanceWrappedModules = performanceModules.map(loadSingleModule);
+    const advertisementWrappedModules = advertisementModules.map(
+        loadSingleModule
     );
 
     cmp.addModules(
@@ -147,11 +138,7 @@ const loadModules = (): Promise<void> => {
         performanceWrappedModules,
         advertisementWrappedModules
     );
-
-    // eslint-disable-next-line no-console
-    console.log('Promises: ', essentialModules.length);
-    cmp.addModules([], [], [], advertisementWrappedModules);
-    return Promise.all(cmp.runModules()).then((): void => {});
+    return cmp.runModules().then((): void => {});
 };
 
 export const bootCommercial = (): Promise<void> => {

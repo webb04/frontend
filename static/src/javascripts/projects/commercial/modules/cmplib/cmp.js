@@ -58,16 +58,22 @@ export class ConsentManagementPlatform {
                 this.perfStack.length +
                 this.adStack.length} modules.`
         );
-        return modulePromises; // Return instead a single promise wrapping all the module promises?
+
+        this.essenStack = [];
+        this.funcStack = [];
+        this.perfStack = [];
+        this.adStack = [];
+
+        return Promise.all(modulePromises);
     }
 
     // The following is for testing purposes. Will eventually get individual consent states
     static functionalConsent() {
-        return getAdConsentState(thirdPartyTrackingAdConsent);
+        return true;
     }
 
     static performanceConsent() {
-        return getAdConsentState(thirdPartyTrackingAdConsent);
+        return true;
     }
 
     static advertisementConsent() {
