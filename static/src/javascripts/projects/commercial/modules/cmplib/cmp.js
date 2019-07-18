@@ -4,25 +4,27 @@ import {
     thirdPartyTrackingAdConsent,
 } from 'common/modules/commercial/ad-prefs.lib';
 
+export type CmpStack = {
+    essential: Array<() => Promise<any>>,
+    functional: Array<() => Promise<any>>,
+    performance: Array<() => Promise<any>>,
+    advertisement: Array<() => Promise<any>>,
+};
+
 export class ConsentManagementPlatform {
     essenStack = [];
     funcStack = [];
     perfStack = [];
     adStack = [];
 
-    addModules(
-        newEssenStack: Array<Function>,
-        newFuncStack: Array<Function>,
-        newPerfStack: Array<Function>,
-        newAdStack: Array<Function>
-    ): void {
-        this.essenStack.push(...newEssenStack);
-        this.funcStack.push(...newFuncStack);
-        this.perfStack.push(...newPerfStack);
-        this.adStack.push(...newAdStack);
+    addModules(newStack: CmpStack): void {
+        this.essenStack.push(...newStack.essential);
+        this.funcStack.push(...newStack.functional);
+        this.perfStack.push(...newStack.performance);
+        this.adStack.push(...newStack.advertisement);
     }
 
-    runModules() {
+    runModules(): Promise<any> {
         const modulePromises = [];
         const funcConsent = ConsentManagementPlatform.functionalConsent();
         const perfConsent = ConsentManagementPlatform.performanceConsent();
@@ -51,13 +53,13 @@ export class ConsentManagementPlatform {
         }
 
         // eslint-disable-next-line no-console
-        console.log(
-            `Ran ${modulePromises.length} modules out of ${this.essenStack
-                .length +
-                this.funcStack.length +
-                this.perfStack.length +
-                this.adStack.length} modules.`
-        );
+        // console.log(
+        //     `Ran ${modulePromises.length} modules out of ${this.essenStack
+        //         .length +
+        //         this.funcStack.length +
+        //         this.perfStack.length +
+        //         this.adStack.length} modules.`
+        // );
 
         this.essenStack = [];
         this.funcStack = [];

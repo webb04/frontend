@@ -26,6 +26,7 @@ import { commercialFeatures } from 'common/modules/commercial/commercial-feature
 import { initCheckDispatcher } from 'commercial/modules/check-dispatcher';
 import { initCommentAdverts } from 'commercial/modules/comment-adverts';
 import { ConsentManagementPlatform } from 'commercial/modules/cmplib/cmp';
+import type { CmpStack } from 'commercial/modules/cmplib/cmp';
 
 const cmp = new ConsentManagementPlatform();
 
@@ -108,14 +109,13 @@ const loadSingleModule = (module: Array<any>): Function => {
         catchErrorsWithContext(
             [
                 [
-                    [
-                        moduleName,
-                        function pushAfterComplete(): void {
-                            result = moduleInit();
-                        },
-                    ],
+                    moduleName,
+                    function pushAfterComplete(): void {
+                        result = moduleInit();
+                    },
                 ],
             ],
+
             {
                 feature: 'commercial',
             }
@@ -124,21 +124,24 @@ const loadSingleModule = (module: Array<any>): Function => {
     };
 };
 
-const loadModules = (): Promise<void> => {
-    const essentialWrappedModules = essentialModules.map(loadSingleModule);
-    const functionalWrappedModules = functionalModules.map(loadSingleModule);
-    const performanceWrappedModules = performanceModules.map(loadSingleModule);
-    const advertisementWrappedModules = advertisementModules.map(
-        loadSingleModule
-    );
+const loadModules = (): Promise<any> => {
+    const commercialStack: CmpStack = {
+        essential: essentialModules.map(loadSingleModule),
+        functional: functionalModules.map(loadSingleModule),
+        performance: performanceModules.map(loadSingleModule),
+        advertisement: advertisementModules.map(loadSingleModule),
+    };
 
-    cmp.addModules(
-        essentialWrappedModules,
-        functionalWrappedModules,
-        performanceWrappedModules,
-        advertisementWrappedModules
-    );
-    return cmp.runModules().then((): void => {});
+    // const essentialWrappedModules = essentialModules.map(loadSingleModule);
+    // const functionalWrappedModules = functionalModules.map(loadSingleModule);
+    // const performanceWrappedModules = functionalModules.map(loadSingleModule);
+    // const advertisementWrappedModules = advertisementModules.map(
+    //     loadSingleModule
+    // );
+
+    cmp.addModules(commercialStack);
+
+    return cmp.runModules();
 };
 
 export const bootCommercial = (): Promise<void> => {
