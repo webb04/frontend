@@ -87,10 +87,4 @@ describe('third party tags', () => {
             expect(document.scripts.length).toBe(2);
         });
     });
-    describe('loadOther', () => {
-        it('should call insert scripts', () => {
-            loadOther();
-            expect(document.scripts.length).toBe(2);
-        });
-    });
 });
