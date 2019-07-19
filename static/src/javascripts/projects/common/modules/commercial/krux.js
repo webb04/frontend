@@ -75,7 +75,6 @@ const configureSegments = () => {
 };
 
 const onLoad = () => {
-    console.log('Krux loading');
     configureSegments();
 };
 

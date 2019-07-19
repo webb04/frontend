@@ -73,7 +73,6 @@ const loadOther = (): void => {
 };
 
 const init = (): Promise<boolean> => {
-    console.log('init third party');
     if (!commercialFeatures.thirdPartyTags) {
         return Promise.resolve(false);
     }
