@@ -38,10 +38,6 @@ const essentialModules: Array<Array<any>> = [
     ['cm-checkDispatcher', initCheckDispatcher],
 ];
 
-const functionalModules: Array<Array<any>> = [];
-
-const performanceModules: Array<Array<any>> = [];
-
 const advertisementModules: Array<Array<any>> = [
     ['cm-lotame-cmp', initLotameCmp],
     ['cm-lotame-data-extract', initLotameDataExtract],
@@ -127,17 +123,8 @@ const loadSingleModule = (module: Array<any>): Function => {
 const loadModules = (): Promise<any> => {
     const commercialStack: CmpStack = {
         essential: essentialModules.map(loadSingleModule),
-        functional: functionalModules.map(loadSingleModule),
-        performance: performanceModules.map(loadSingleModule),
         advertisement: advertisementModules.map(loadSingleModule),
     };
-
-    // const essentialWrappedModules = essentialModules.map(loadSingleModule);
-    // const functionalWrappedModules = functionalModules.map(loadSingleModule);
-    // const performanceWrappedModules = functionalModules.map(loadSingleModule);
-    // const advertisementWrappedModules = advertisementModules.map(
-    //     loadSingleModule
-    // );
 
     cmp.addModules(commercialStack);
 

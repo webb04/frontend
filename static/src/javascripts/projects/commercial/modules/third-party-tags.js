@@ -12,6 +12,10 @@ import { ias } from 'commercial/modules/third-party-tags/ias';
 import { inizio } from 'commercial/modules/third-party-tags/inizio';
 import { fbPixel } from 'commercial/modules/third-party-tags/facebook-pixel';
 import { init as initPlistaOutbrainRenderer } from 'commercial/modules/third-party-tags/plista-outbrain-renderer';
+import { ConsentManagementPlatform } from 'commercial/modules/cmplib/cmp';
+import type { CmpStack } from 'commercial/modules/cmplib/cmp';
+
+const cmp = new ConsentManagementPlatform();
 
 const insertScripts = (services: Array<ThirdPartyTag>): void => {
     const ref = document.scripts[0];
@@ -39,21 +43,37 @@ const insertScripts = (services: Array<ThirdPartyTag>): void => {
 };
 
 const loadOther = (): void => {
-    const services: Array<ThirdPartyTag> = [
-        imrWorldwide,
-        imrWorldwideLegacy,
-        remarketing,
-        simpleReach,
-        krux,
-        ias,
-        inizio,
-        fbPixel(),
-    ].filter(_ => _.shouldRun);
+    const moduleStack = {
+        advertisement: [
+            imrWorldwide,
+            imrWorldwideLegacy,
+            remarketing,
+            simpleReach,
+            krux,
+            ias,
+            inizio,
+            fbPixel(),
+        ],
+    };
 
-    insertScripts(services);
+    const finalStack: CmpStack = Object.keys(moduleStack).reduce((acc, key) => {
+        const item = {
+            [key]: [
+                insertScripts.bind(
+                    null,
+                    moduleStack[key].filter(_ => _.shouldRun)
+                ),
+            ],
+        };
+
+        return Object.assign(acc, item);
+    }, {});
+
+    cmp.addModules(finalStack).runModules();
 };
 
 const init = (): Promise<boolean> => {
+    console.log('init third party');
     if (!commercialFeatures.thirdPartyTags) {
         return Promise.resolve(false);
     }
@@ -64,7 +84,12 @@ const init = (): Promise<boolean> => {
     // check above is now sensitive to ad-free, it could be changed independently
     // in the future - even by accident.  Justin.
     if (!commercialFeatures.adFree) {
-        initPlistaOutbrainRenderer();
+        cmp.addModules({
+            essential: [initPlistaOutbrainRenderer],
+            functional: [],
+            performance: [],
+            advertisement: [],
+        }).runModules();
     }
 
     loadOther();
