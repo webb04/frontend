@@ -58,9 +58,8 @@ const retrieve = (n: string): string => {
 };
 
 export const getKruxSegments = (): Array<string> => {
-    // everything except an explicit denial of consent gives segments
     const hasConsent: boolean =
-        ConsentManagementPlatform.advertisementConsent() !== false;
+        ConsentManagementPlatform.advertisementConsent() === true;
     const segments: string = hasConsent ? retrieve('segs') : '';
     return segments ? segments.split(',') : [];
 };
