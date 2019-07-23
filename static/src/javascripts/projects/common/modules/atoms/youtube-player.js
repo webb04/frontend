@@ -3,11 +3,8 @@ import fastdom from 'fastdom';
 
 import config from 'lib/config';
 import { loadScript } from 'lib/load-script';
-import {
-    getAdConsentState,
-    thirdPartyTrackingAdConsent,
-} from 'common/modules/commercial/ad-prefs.lib';
 import { commercialFeatures } from 'common/modules/commercial/commercial-features';
+import { ConsentManagementPlatform } from 'commercial/modules/cmplib/cmp';
 
 const scriptSrc = 'https://www.youtube.com/iframe_api';
 const promise = new Promise(resolve => {
@@ -88,8 +85,8 @@ const setupPlayer = (
     onStateChange,
     onError
 ) => {
-    const wantPersonalisedAds: boolean =
-        getAdConsentState(thirdPartyTrackingAdConsent) !== false;
+    const hasConsent: boolean =
+        ConsentManagementPlatform.advertisementConsent() !== false;
     const disableRelatedVideos = !config.get('switches.youtubeRelatedVideos');
     // relatedChannels needs to be an array, as per YouTube's IFrame Embed Config API
     const relatedChannels = [];
@@ -103,7 +100,7 @@ const setupPlayer = (
 
     const adsConfig = commercialFeatures.adFree
         ? { disableAds: true }
-        : { nonPersonalizedAd: !wantPersonalisedAds };
+        : { nonPersonalizedAd: !hasConsent };
 
     return new window.YT.Player(eltId, {
         videoId,
