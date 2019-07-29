@@ -8,6 +8,12 @@ import { load } from './outbrain-load';
 
 const getBreakpoint: any = getBreakpoint_;
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
+
 jest.mock('ophan/ng', () => ({ record: () => undefined }));
 jest.mock('lib/detect', () => ({
     adblockInUse: Promise.resolve(false),

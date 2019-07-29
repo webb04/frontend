@@ -11,6 +11,12 @@ const { getSlots } = _;
 const getBreakpointKey: any = getBreakpointKey_;
 const shouldIncludeMobileSticky: any = shouldIncludeMobileSticky_;
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
+
 jest.mock('./utils', () => {
     // $FlowFixMe property requireActual is actually not missing Flow.
     const original = jest.requireActual('./utils');

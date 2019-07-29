@@ -3,6 +3,12 @@ import { load } from 'commercial/modules/hosted/next-video';
 import fetchJson from 'lib/fetch-json';
 import config from 'lib/config';
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
+
 jest.mock('lib/fetch-json', () =>
     jest.fn(() => Promise.resolve({ html: '<div class="video"></div>' }))
 );

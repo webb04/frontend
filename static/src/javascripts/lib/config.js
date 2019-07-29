@@ -1,4 +1,5 @@
 // @flow
+import reportError from 'lib/report-error';
 
 // This should be the only module accessing the window config object directly
 // because this is the one that gets imported to all other modules
@@ -15,6 +16,18 @@ const get = (path: string = '', defaultValue: any): any => {
 
     if (typeof value !== 'undefined') {
         return value;
+    }
+
+    if (defaultValue === undefined) {
+        reportError(
+            new Error(
+                `Missing config path requested without fallback defaultValue: ${path}`
+            ),
+            {
+                feature: 'config',
+            },
+            false
+        );
     }
 
     return defaultValue;

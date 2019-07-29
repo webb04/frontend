@@ -5,6 +5,12 @@ import toPairs from 'lodash/toPairs';
 import fromPairs from 'lodash/fromPairs';
 import { NOT_IN_TEST, notInTestVariant } from './ab-constants';
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
+
 export const testSwitchExists = (testId: string): boolean =>
     config.get(`switches.ab${testId}`, 'NOT_FOUND') !== 'NOT_FOUND';
 

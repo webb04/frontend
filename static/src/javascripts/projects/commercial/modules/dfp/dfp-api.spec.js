@@ -19,6 +19,11 @@ const { fillAdvertSlots: actualFillAdvertSlots } = jest.requireActual(
 const getBreakpoint: any = getBreakpoint_;
 const fillAdvertSlots: any = fillAdvertSlots_;
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
 jest.mock('commercial/modules/dfp/fill-advert-slots', () => ({
     fillAdvertSlots: jest.fn(),
 }));

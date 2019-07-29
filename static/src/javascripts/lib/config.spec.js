@@ -22,8 +22,18 @@ Object.assign(window.guardian.config, {
 // (but can't do it with the jest mocks that get auto-hoisted)
 // eslint-disable-next-line import/first
 import config from './config';
+// eslint-disable-next-line import/first
+import reportError_ from 'lib/report-error';
+
+const reportError: any = reportError_;
+
+jest.mock('lib/report-error', () => jest.fn());
 
 describe('Config', () => {
+    beforeEach(() => {
+        reportError.mockReset();
+    });
+
     it('should have "hasTone" property', () => {
         expect(config.hasTone('foo')).toBeTruthy();
         expect(config.hasTone('foo-bad')).toBeFalsy();
@@ -84,5 +94,20 @@ describe('Config', () => {
     it('`set` should safely set (or orverride) a value deep inside the config object', () => {
         config.set('some.random.path', 'hello');
         expect(config.get('some.random.path')).toEqual('hello');
+    });
+
+    it('`get` should return default value for non-existing key with a default', () => {
+        expect(config.get('page.qwert', ['I am the default'])).toEqual([
+            'I am the default',
+        ]);
+    });
+
+    it('`get` should report error for non-existing key without a default', () => {
+        expect(config.get('page.qwert')).toBeUndefined();
+        expect(reportError).toHaveBeenCalledTimes(1);
+    });
+
+    it('`get` should not report error for non-existing key with a default', () => {
+        expect(reportError).toHaveBeenCalledTimes(0);
     });
 });

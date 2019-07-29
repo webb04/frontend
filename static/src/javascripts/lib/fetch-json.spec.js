@@ -6,6 +6,11 @@ import fetchJson from './fetch-json';
 
 const chance = new Chance();
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
 jest.mock('lib/fetch', () => jest.fn());
 const fetchSpy: any = require('lib/fetch');
 

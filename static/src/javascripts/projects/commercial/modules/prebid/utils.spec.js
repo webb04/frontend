@@ -31,6 +31,12 @@ const getBreakpoint: any = getBreakpoint_;
 const isBreakpoint: any = isBreakpoint_;
 const getCookie: any = getCookie_;
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
+
 jest.mock('lodash/once', () => a => a);
 
 jest.mock('lib/geolocation', () => ({

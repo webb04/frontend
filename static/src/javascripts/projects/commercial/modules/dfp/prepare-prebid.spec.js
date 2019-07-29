@@ -8,6 +8,12 @@ import { _ } from './prepare-prebid';
 
 const { isGoogleProxy, setupPrebid } = _;
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
+
 jest.mock('common/modules/commercial/commercial-features', () => ({
     commercialFeatures: {},
 }));

@@ -7,6 +7,12 @@ import { getAdvertById as getAdvertById_ } from 'commercial/modules/dfp/get-adve
 
 const getAdvertById: any = getAdvertById_;
 
+/**
+ * mock report-error so it doesn't execute
+ * via config import in this test.
+ */
+jest.mock('lib/report-error', () => jest.fn());
+
 jest.mock('lib/raven');
 
 jest.mock('commercial/modules/dfp/Advert', () =>
