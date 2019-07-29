@@ -12,6 +12,10 @@ jest.mock('raven-js', () => ({
     captureException: jest.fn(),
 }));
 
+jest.mock('lib/config', () => ({
+    get: jest.fn(() => false),
+}));
+
 const fakeRaven: any = require('raven-js');
 
 describe('report-error', () => {
