@@ -84,6 +84,7 @@ const init = (): Promise<boolean> => {
     if (!config.get('isDotcomRendering', false) && !commercialFeatures.adFree) {
         initPlistaOutbrainRenderer();
     }
+    initPlistaOutbrainRenderer();
 
     loadOther();
 

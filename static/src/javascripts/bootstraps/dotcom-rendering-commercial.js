@@ -2,7 +2,7 @@
 import config from 'lib/config';
 import { catchErrorsWithContext } from 'lib/robust';
 import { markTime } from 'lib/user-timing';
-import reportError from 'lib/report-error';
+// import reportError from 'lib/report-error';
 import { init as initHighMerch } from 'commercial/modules/high-merch';
 import { init as initArticleAsideAdverts } from 'commercial/modules/article-aside-adverts';
 import { init as initArticleBodyAdverts } from 'commercial/modules/article-body-adverts';
@@ -54,6 +54,22 @@ if (false && !commercialFeatures.adFree) {
     );
 }
 
+commercialModules.push(
+    ['cm-prepare-prebid', preparePrebid],
+    ['cm-prepare-googletag', prepareGoogletag],
+    ['cm-thirdPartyTags', initThirdPartyTags],
+    ['cm-prepare-adverification', prepareAdVerification],
+    ['cm-mobileSticky', initMobileSticky],
+    ['cm-highMerch', initHighMerch],
+    ['cm-articleAsideAdverts', initArticleAsideAdverts],
+    ['cm-articleBodyAdverts', initArticleBodyAdverts],
+    ['cm-liveblogAdverts', initLiveblogAdverts],
+    ['cm-stickyTopBanner', initStickyTopBanner],
+    ['cm-paidContainers', paidContainers],
+    ['cm-paidforBand', initPaidForBand],
+    ['cm-commentAdverts', initCommentAdverts]
+);
+
 const loadHostedBundle = (): Promise<void> => {
     if (config.get('page.isHosted')) {
         return new Promise(resolve => {
@@ -89,9 +105,9 @@ const loadHostedBundle = (): Promise<void> => {
 
 const loadModules = (): Promise<any> => {
     const modulePromises = [];
-
     commercialModules.forEach(module => {
         const moduleName: string = module[0];
+        console.log(`Loading module: ${moduleName}`);
         const moduleInit: () => void = module[1];
 
         catchErrorsWithContext(
@@ -159,7 +175,8 @@ const bootCommercial = (): Promise<void> => {
                     feature: 'commercial',
                 }
             );
-        })
+        });
+    /*
         .catch(err => {
             // report async errors in bootCommercial to Sentry with the commercial feature tag
             reportError(
@@ -170,6 +187,7 @@ const bootCommercial = (): Promise<void> => {
                 false
             );
         });
+        */
 };
 
 bootCommercial();

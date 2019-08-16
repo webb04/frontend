@@ -101,7 +101,6 @@ export const init = (): Promise<void> => {
                 fillAdvertSlots();
             }
         );
-
         onConsentNotification('advertisement', state => {
             if (state !== null) {
                 window.googletag.cmd.push(() => {
@@ -111,7 +110,6 @@ export const init = (): Promise<void> => {
                 });
             }
         });
-
         // Just load googletag. Prebid will already be loaded, and googletag is already added to the window by Prebid.
         return loadScript(config.get('libs.googletag'), { async: false });
     };
@@ -123,7 +121,6 @@ export const init = (): Promise<void> => {
         setupAdvertising()
             .then(adFreeSlotRemove)
             .catch(removeAdSlots);
-
         return Promise.resolve();
     }
 

@@ -440,9 +440,11 @@ object DotcomponentsDataModel {
       CamelCase.fromHyphenated(key.split('.').lastOption.getOrElse(""))
     }
 
-    val switches = conf.switches.Switches.all.filter(_.exposeClientSide).foldLeft(Map.empty[String,Boolean])( (acc, switch) => {
+    val switches1 = conf.switches.Switches.all.filter(_.exposeClientSide).foldLeft(Map.empty[String,Boolean])( (acc, switch) => {
       acc + (CamelCase.fromHyphenated(switch.name) -> switch.isSwitchedOn)
     })
+
+    val switches = switches1 + ("outbrainDCRTest" -> true)
 
     // See https://developers.google.com/search/docs/data-types/article (and the AMP info too)
     // For example, we need to provide an image of at least 1200px width to be valid here

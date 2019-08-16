@@ -62,14 +62,27 @@ const load = (
     contributionEpicVisible?: boolean = false
 ): Promise<void> => {
     const outbrainType = target && target in selectors ? target : 'defaults';
+    console.log('outbrainType:');
+    console.log(outbrainType);
+
     const $outbrain = $(selectors.outbrain.widget);
+    console.log('$outbrain:');
+    console.log($outbrain);
+
     const $container = $(selectors.outbrain.container, $outbrain[0]);
+    console.log('$container:');
+    console.log($container);
+
     const breakpoint = getBreakpoint();
+    console.log('breakpoint:');
+    console.log(breakpoint);
 
     const shouldUseNewOutbrainCodes: boolean = config.get(
         'switches.commercialOutbrainNewids',
         false
     );
+    console.log('shouldUseNewOutbrainCodes:');
+    console.log(shouldUseNewOutbrainCodes);
 
     const widgetCodes = ((): {
         code?: string,
@@ -91,14 +104,25 @@ const load = (
         });
     })();
 
+    console.log('widgetCodes:');
+    console.log(widgetCodes);
+
     const widgetHtml = build(widgetCodes, breakpoint);
+    console.log('widgetHtml:');
+    console.log(widgetHtml);
+
+    console.log('$container.length:');
+    console.log($container.length);
 
     if ($container.length) {
+        console.log('fastdom');
+
         return fastdom
             .write(() => {
                 if (outbrainType === 'merchandising') {
                     $(selectors.merchandising.widget).replaceWith($outbrain[0]);
                 }
+                console.log('fastdom (2)');
                 $container.append(widgetHtml);
                 $outbrain.css('display', 'block');
             })
@@ -106,6 +130,9 @@ const load = (
                 tracking({
                     widgetId: widgetCodes.code || widgetCodes.image,
                 });
+                console.log('fastdom (3)');
+                console.log('outbrainUrl:');
+                console.log(outbrainUrl);
                 loadScript(outbrainUrl);
             });
     }

@@ -1,6 +1,6 @@
 // @flow strict
-import { isInVariantSynchronous } from 'common/modules/experiments/ab';
-import { commercialOutbrainTesting } from 'common/modules/experiments/tests/commercial-outbrain-testing.js';
+// import { isInVariantSynchronous } from 'common/modules/experiments/ab';
+// import { commercialOutbrainTesting } from 'common/modules/experiments/tests/commercial-outbrain-testing.js';
 import { adblockInUse } from 'lib/detect';
 import { waitForCheck } from 'common/modules/check-mediator';
 import { load } from './outbrain-load';
@@ -13,10 +13,12 @@ type OutbrainPageConditions = {
     storyQuestionsVisible: boolean,
 };
 
+/*
 type OutbrainDfpConditions = {
     blockedByAds: boolean,
     useMerchandiseAdSlot: boolean,
 };
+*/
 
 const noMerchSlotsExpected = (): Promise<boolean> =>
     // Loading Outbrain is dependent on successful return of high relevance component
@@ -45,6 +47,7 @@ const getOutbrainPageConditions = (): Promise<OutbrainPageConditions> =>
         })
     );
 
+/*
 const getOutbrainDfpConditions = (): Promise<OutbrainDfpConditions> =>
     Promise.all([
         waitForCheck('isOutbrainBlockedByAds'),
@@ -53,6 +56,7 @@ const getOutbrainDfpConditions = (): Promise<OutbrainDfpConditions> =>
         blockedByAds,
         useMerchandiseAdSlot: merchandiseCompliant,
     }));
+*/
 
 export const getOutbrainComplianceTargeting = (): Promise<
     Map<string, string>
@@ -91,7 +95,9 @@ export const getOutbrainComplianceTargeting = (): Promise<
   true              false               false             n/a              false         false      false     compliant
 */
 
+/*
 export const initOutbrain = (): Promise<void> =>
+
     getOutbrainPageConditions().then(pageConditions => {
         // temporary addition based on a zero participation AB test
         // Remove after 19-03-25 as testing will be complete.
@@ -133,3 +139,6 @@ export const initOutbrain = (): Promise<void> =>
             });
         }
     });
+*/
+
+export const initOutbrain = (): Promise<void> => load('defaults');
